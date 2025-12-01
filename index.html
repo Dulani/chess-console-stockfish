@@ -42,6 +42,11 @@
             <input id="fenInput" class="form-control" placeholder="FEN"
                    value="ppppkppp/pppppppp/pppppppp/pppppppp/8/8/8/RNBQKBNR w KQ - 0 1"/>
         </div>
+        <div class="input-group mb-4">
+            <button id="generateButton" class="btn btn-outline-primary" type="button">Generate Recommendations</button>
+            <button id="downloadButton" class="btn btn-outline-secondary" type="button" disabled>Download Dataset</button>
+            <button id="saveButton" class="btn btn-outline-secondary" type="button" disabled>Save to Firebase</button>
+        </div>
     </form>
     <h3>Repositories and further information on GitHub</h3>
     <dl>
@@ -73,15 +78,15 @@
 <script type="importmap">
     {
         "imports": {
-            "chess-console/": "./node_modules/chess-console/",
-            "cm-engine-runner/": "./node_modules/cm-engine-runner/",
-            "cm-polyglot/": "./node_modules/cm-polyglot/",
-            "cm-chessboard/": "./node_modules/cm-chessboard/",
-            "cm-web-modules/": "./node_modules/cm-web-modules/",
-            "chess.mjs/": "./node_modules/chess.mjs/",
-            "cm-pgn/": "./node_modules/cm-pgn/",
-            "cm-chess/": "./node_modules/cm-chess/",
-            "bootstrap-show-modal/": "./node_modules/bootstrap-show-modal/"
+            "chess-console/": "https://cdn.jsdelivr.net/npm/chess-console@6.12.4/",
+            "cm-engine-runner/": "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/",
+            "cm-web-modules/": "https://cdn.jsdelivr.net/npm/cm-web-modules@2.4.4/",
+            "cm-polyglot/": "https://cdn.jsdelivr.net/npm/cm-polyglot/",
+            "cm-chessboard/": "https://cdn.jsdelivr.net/npm/cm-chessboard/",
+            "chess.mjs/": "https://cdn.jsdelivr.net/npm/chess.mjs/",
+            "cm-pgn/": "https://cdn.jsdelivr.net/npm/cm-pgn/",
+            "cm-chess/": "https://cdn.jsdelivr.net/npm/cm-chess/",
+            "bootstrap-show-modal/": "https://cdn.jsdelivr.net/npm/bootstrap-show-modal/"
         }
     }
 </script>
@@ -102,6 +107,7 @@
     import {StockfishPlayer} from "./src/StockfishPlayer.js"
     import {StockfishStateView} from "./src/StockfishStateView.js"
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
+    import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
 
     const i18n = new I18n()
     i18n.load({
@@ -117,14 +123,14 @@
         {name: i18n.t("playerName"), type: LocalPlayer},
         {
             name: "Stockfish", type: StockfishPlayer, props: {
-                worker: "./node_modules/cm-engine-runner/engines/stockfish-v10-niklasf.js",
+                worker: "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/engines/stockfish-v10-niklasf.js",
                 book: "./assets/books/openings.bin",
                 level: 1,
                 debug: true
             }
         })
     new Board(chessConsole, {
-        assetsUrl: "./node_modules/cm-chessboard/assets/"
+        assetsUrl: "https://cdn.jsdelivr.net/npm/cm-chessboard/assets/"
     }).initialized.then(() => {
         new Persistence(chessConsole, {
             savePrefix: "Stockfish"
@@ -151,6 +157,32 @@
         })
     })
 
+    let analysisResult = null
+    document.getElementById("generateButton").addEventListener("click", async () => {
+        const generateButton = document.getElementById("generateButton")
+        const downloadButton = document.getElementById("downloadButton")
+        const saveButton = document.getElementById("saveButton")
+        generateButton.innerText = "Generating..."
+        generateButton.disabled = true
+        downloadButton.disabled = true
+        saveButton.disabled = true
+        const analysisGenerator = new AnalysisGenerator(chessConsole, chessConsole.opponent)
+        analysisResult = await analysisGenerator.generate()
+        generateButton.innerText = "Generate Recommendations"
+        generateButton.disabled = false
+        downloadButton.disabled = false
+        saveButton.disabled = false
+    })
+
+    document.getElementById("downloadButton").addEventListener("click", () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(analysisResult, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "analysis.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    })
 </script>
 </body>
 </html>

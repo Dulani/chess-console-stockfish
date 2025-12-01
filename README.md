@@ -6,7 +6,7 @@ engine.
 
 ## See it in action
 
-- [Demo (the index.html of this repository)](https://shaack.com/projekte/chess-console-stockfish/)
+- [Demo (the index.html of this repository)](https://dulani.github.io/chess-console-stockfish/)
 - [Real-life example in chessmail.de](https://www.chessmail.de/pages/chess-computer.html)
 
 ## Installation
