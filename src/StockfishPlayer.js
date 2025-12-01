@@ -80,47 +80,49 @@ export class StockfishPlayer extends ChessConsolePlayer {
         })
     }
 
-    moveRequest(fen, moveResponse) {
+    async moveRequest(fen, moveResponse) {
         if (this.props.debug) {
             console.log("moveRequest", fen)
         }
-        this.initialisation.then(async () => {
-            this.state.engineState = ENGINE_STATE.THINKING
-            if(this.state.level < 3) {
-                this.state.currentRunner = this.engineRunner // No book for Level 1 and 2
+        await this.initialisation
+        this.state.engineState = ENGINE_STATE.THINKING
+        if (this.state.level < 3) {
+            this.state.currentRunner = this.engineRunner // No book for Level 1 and 2
+        }
+        let nextMove = await this.state.currentRunner.calculateMove(fen, {level: this.state.level})
+        if (!nextMove) {
+            if (this.props.debug) {
+                console.log("no move found with", this.state.currentRunner.constructor.name)
             }
-            let nextMove = await this.state.currentRunner.calculateMove(fen, {level: this.state.level })
-            if (!nextMove) {
-                if (this.props.debug) {
-                    console.log("no move found with", this.state.currentRunner.constructor.name)
-                }
-                if (this.state.currentRunner === this.openingRunner) {
-                    this.state.currentRunner = this.engineRunner
-                    this.moveRequest(fen, moveResponse)
-                } else {
-                    throw new Error("can't find move with fen " + fen + " and runner " + this.state.currentRunner)
-                }
+            if (this.state.currentRunner === this.openingRunner) {
+                this.state.currentRunner = this.engineRunner
+                return this.moveRequest(fen, moveResponse)
             } else {
-                if (this.props.debug) {
-                    console.log("this.state.currentRunner", this.state.currentRunner)
-                    console.log("nextMove", nextMove, this.state.currentRunner.constructor.name)
-                }
-                let newScore = undefined
-                if (nextMove.score !== undefined) {
-                    if(!isNaN(nextMove.score)) {
-                        // newScore = this.chessConsole.props.playerColor === COLOR.white ? -nextMove.score : nextMove.score
-                        newScore = -nextMove.score
-                    } else {
-                        newScore = nextMove.score
-                    }
-                    this.state.scoreHistory[this.chessConsole.state.chess.plyCount()] = newScore
-                    this.state.score = newScore
+                throw new Error("can't find move with fen " + fen + " and runner " + this.state.currentRunner)
+            }
+        } else {
+            if (this.props.debug) {
+                console.log("this.state.currentRunner", this.state.currentRunner)
+                console.log("nextMove", nextMove, this.state.currentRunner.constructor.name)
+            }
+            let newScore = undefined
+            if (nextMove.score !== undefined) {
+                if (!isNaN(nextMove.score)) {
+                    // newScore = this.chessConsole.props.playerColor === COLOR.white ? -nextMove.score : nextMove.score
+                    newScore = -nextMove.score
                 } else {
-                    this.state.score = undefined
+                    newScore = nextMove.score
                 }
-                this.state.engineState = ENGINE_STATE.READY
+                this.state.scoreHistory[this.chessConsole.state.chess.plyCount()] = newScore
+                this.state.score = newScore
+            } else {
+                this.state.score = undefined
+            }
+            this.state.engineState = ENGINE_STATE.READY
+            if (moveResponse) {
                 moveResponse(nextMove)
             }
-        })
+            return nextMove
+        }
     }
 }
