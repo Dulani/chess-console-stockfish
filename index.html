@@ -42,6 +42,11 @@
             <input id="fenInput" class="form-control" placeholder="FEN"
                    value="ppppkppp/pppppppp/pppppppp/pppppppp/8/8/8/RNBQKBNR w KQ - 0 1"/>
         </div>
+        <div class="input-group mb-4">
+            <button id="generateButton" class="btn btn-outline-primary" type="button">Generate Recommendations</button>
+            <button id="downloadButton" class="btn btn-outline-secondary" type="button" disabled>Download Dataset</button>
+            <button id="saveButton" class="btn btn-outline-secondary" type="button" disabled>Save to Firebase</button>
+        </div>
     </form>
     <h3>Repositories and further information on GitHub</h3>
     <dl>
@@ -102,6 +107,7 @@
     import {StockfishPlayer} from "./src/StockfishPlayer.js"
     import {StockfishStateView} from "./src/StockfishStateView.js"
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
+    import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
 
     const i18n = new I18n()
     i18n.load({
@@ -151,6 +157,32 @@
         })
     })
 
+    let analysisResult = null
+    document.getElementById("generateButton").addEventListener("click", async () => {
+        const generateButton = document.getElementById("generateButton")
+        const downloadButton = document.getElementById("downloadButton")
+        const saveButton = document.getElementById("saveButton")
+        generateButton.innerText = "Generating..."
+        generateButton.disabled = true
+        downloadButton.disabled = true
+        saveButton.disabled = true
+        const analysisGenerator = new AnalysisGenerator(chessConsole, chessConsole.opponent)
+        analysisResult = await analysisGenerator.generate()
+        generateButton.innerText = "Generate Recommendations"
+        generateButton.disabled = false
+        downloadButton.disabled = false
+        saveButton.disabled = false
+    })
+
+    document.getElementById("downloadButton").addEventListener("click", () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(analysisResult, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "analysis.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    })
 </script>
 </body>
 </html>
