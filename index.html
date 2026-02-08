@@ -10,7 +10,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <h1>Stockfish for <a href="https://github.com/shaack/chess-console">chess-console</a></h1>
+    <h1>Stockfish for <a href="https://github.com/shaack/chess-console">chess-console</a> (v 0.1)</h1>
     <div id="console-container" class="mb-3">
         <div class="row chess-console">
             <div class="chess-console-center col-xl-7 order-xl-2 col-lg-8 order-lg-1 order-md-1 col-md-12">
@@ -78,9 +78,9 @@
 <script type="importmap">
     {
         "imports": {
-            "chess-console/": "https://cdn.jsdelivr.net/npm/chess-console@6.12.4/",
-            "cm-engine-runner/": "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/",
-            "cm-web-modules/": "https://cdn.jsdelivr.net/npm/cm-web-modules@2.4.4/",
+            "chess-console/": "https://cdn.jsdelivr.net/npm/chess-console@6.13.1/",
+            "cm-engine-runner/": "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.4/",
+            "cm-web-modules/": "https://cdn.jsdelivr.net/npm/cm-web-modules@2.5.1/",
             "cm-polyglot/": "https://cdn.jsdelivr.net/npm/cm-polyglot/",
             "cm-chessboard/": "https://cdn.jsdelivr.net/npm/cm-chessboard/",
             "chess.mjs/": "https://cdn.jsdelivr.net/npm/chess.mjs/",
@@ -123,7 +123,7 @@
         {name: i18n.t("playerName"), type: LocalPlayer},
         {
             name: "Stockfish", type: StockfishPlayer, props: {
-                worker: "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/engines/stockfish-v10-niklasf.js",
+                worker: "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.4/engines/stockfish-v10-niklasf.js",
                 book: "./assets/books/openings.bin",
                 level: 1,
                 debug: true
