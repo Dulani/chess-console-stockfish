@@ -10,6 +10,13 @@
 </head>
 <body>
 <div class="container-fluid">
+    <div class="float-end mt-2">
+        <button id="loginButton" class="btn btn-outline-primary btn-sm">Login with Google</button>
+        <div id="userInfo" class="d-none">
+            <span id="userName" class="me-2"></span>
+            <button id="logoutButton" class="btn btn-outline-secondary btn-sm">Logout</button>
+        </div>
+    </div>
     <h1>Stockfish for <a href="https://github.com/shaack/chess-console">chess-console</a> (v 0.1)</h1>
     <div id="console-container" class="mb-3">
         <div class="row chess-console">
@@ -108,6 +115,7 @@
     import {StockfishStateView} from "./src/StockfishStateView.js"
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
     import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
+    import {Auth} from "./src/Auth.js"
 
     const i18n = new I18n()
     i18n.load({
@@ -171,7 +179,7 @@
         generateButton.innerText = "Generate Recommendations"
         generateButton.disabled = false
         downloadButton.disabled = false
-        saveButton.disabled = false
+        saveButton.disabled = auth.auth.currentUser === null
     })
 
     document.getElementById("downloadButton").addEventListener("click", () => {
@@ -183,6 +191,37 @@
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     })
+
+    // Firebase configuration (Placeholders)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    }
+
+    const auth = new Auth(firebaseConfig, (user) => {
+        const loginButton = document.getElementById("loginButton")
+        const userInfo = document.getElementById("userInfo")
+        const userName = document.getElementById("userName")
+        const saveButton = document.getElementById("saveButton")
+
+        if (user) {
+            loginButton.classList.add("d-none")
+            userInfo.classList.remove("d-none")
+            userName.innerText = user.displayName
+            saveButton.disabled = analysisResult === null
+        } else {
+            loginButton.classList.remove("d-none")
+            userInfo.classList.add("d-none")
+            saveButton.disabled = true
+        }
+    })
+
+    document.getElementById("loginButton").addEventListener("click", () => auth.login())
+    document.getElementById("logoutButton").addEventListener("click", () => auth.logout())
 </script>
 </body>
 </html>
