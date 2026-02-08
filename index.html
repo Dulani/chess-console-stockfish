@@ -123,7 +123,7 @@
         {name: i18n.t("playerName"), type: LocalPlayer},
         {
             name: "Stockfish", type: StockfishPlayer, props: {
-                worker: "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.4/engines/stockfish-v10-niklasf.js",
+                worker: "./src/stockfish-worker-proxy.js",
                 book: "./assets/books/openings.bin",
                 level: 1,
                 debug: true
