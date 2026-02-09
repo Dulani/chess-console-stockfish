@@ -3,10 +3,10 @@
 This roadmap outlines the development of the personal chess analysis tool.
 
 ## Phase 1: Authentication & Data Storage
-- [ ] **Add Google Authentication**
-  - Integrate Firebase Auth.
-  - Implement login/logout functionality with Google.
-  - UI for displaying user authentication state.
+- [x] **Add Google Authentication**
+  - [x] Integrate Firebase Auth foundation.
+  - [x] Implement login/logout UI and logic.
+  - [x] Configure Firebase Project.
 - [ ] **Data Storage (Firebase)**
   - Set up Firestore or Realtime Database to store user game data.
   - Implement basic save/load functionality for analysis results.
