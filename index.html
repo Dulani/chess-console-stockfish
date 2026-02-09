@@ -131,6 +131,7 @@
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
     import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
     import {Auth} from "./src/Auth.js"
+    import {getAnalytics} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js"
 
     const i18n = new I18n()
     i18n.load({
@@ -207,14 +208,15 @@
         downloadAnchorNode.remove();
     })
 
-    // Firebase configuration (Placeholders)
+    // Firebase configuration
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyA9In9YKWha3fqaYK1KuYV9j_hhGqUz_vE",
+        authDomain: "chess-history-analyst.firebaseapp.com",
+        projectId: "chess-history-analyst",
+        storageBucket: "chess-history-analyst.firebasestorage.app",
+        messagingSenderId: "676805765630",
+        appId: "1:676805765630:web:1af5342e293af9e24738af",
+        measurementId: "G-5Z27BVFS84"
     }
 
     const auth = new Auth(firebaseConfig, (user) => {
@@ -237,6 +239,9 @@
 
     document.getElementById("loginButton").addEventListener("click", () => auth.login())
     document.getElementById("logoutButton").addEventListener("click", () => auth.logout())
+
+    // Initialize Analytics
+    getAnalytics(auth.app)
 </script>
 </body>
 </html>

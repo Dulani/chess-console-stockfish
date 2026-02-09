@@ -4,8 +4,8 @@
  * License: MIT, see file 'LICENSE'
  */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js"
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js"
 
 export class Auth {
     constructor(firebaseConfig, onUserChanged) {
