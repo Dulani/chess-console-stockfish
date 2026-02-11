@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Stockfish for chess-console</title>
+    <title>Chess Analyst</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
     <link rel="stylesheet" href="./assets/styles/screen.css"/>
 </head>
 <body>
 <div class="container-fluid">
-    <h1>Stockfish for <a href="https://github.com/shaack/chess-console">chess-console</a></h1>
+    <div class="float-start mt-2">
+        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+            <i class="fas fa-bars"></i> Menu
+        </button>
+    </div>
+    <div class="float-end mt-2">
+        <button id="loginButton" class="btn btn-outline-primary btn-sm">Login with Google</button>
+        <div id="userInfo" class="d-none">
+            <span id="userName" class="me-2"></span>
+            <button id="logoutButton" class="btn btn-outline-secondary btn-sm">Logout</button>
+        </div>
+    </div>
+    <h1 title="v0.11">Chess Analyst</h1>
+
     <div id="console-container" class="mb-3">
         <div class="row chess-console">
             <div class="chess-console-center col-xl-7 order-xl-2 col-lg-8 order-lg-1 order-md-1 col-md-12">
@@ -33,43 +46,54 @@
             </div>
         </div>
     </div>
-    <form>
-        <div class="input-group mb-4">
-            <label for="fenInput" class="sr-only">FEN</label>
-            <div class="input-group-prepend">
-                <button id="fenButton" class="btn btn-outline-primary" type="button">Init with FEN</button>
-            </div>
-            <input id="fenInput" class="form-control" placeholder="FEN"
-                   value="ppppkppp/pppppppp/pppppppp/pppppppp/8/8/8/RNBQKBNR w KQ - 0 1"/>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Controls & Information</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="input-group mb-4">
-            <button id="generateButton" class="btn btn-outline-primary" type="button">Generate Recommendations</button>
-            <button id="downloadButton" class="btn btn-outline-secondary" type="button" disabled>Download Dataset</button>
-            <button id="saveButton" class="btn btn-outline-secondary" type="button" disabled>Save to Firebase</button>
+        <div class="offcanvas-body">
+            <form>
+                <div class="mb-3">
+                    <label for="fenInput" class="form-label">FEN</label>
+                    <div class="input-group">
+                        <input id="fenInput" class="form-control" placeholder="FEN"
+                               value="ppppkppp/pppppppp/pppppppp/pppppppp/8/8/8/RNBQKBNR w KQ - 0 1"/>
+                        <button id="fenButton" class="btn btn-outline-primary" type="button">Init</button>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 mb-4">
+                    <button id="generateButton" class="btn btn-outline-primary" type="button">Generate Recommendations</button>
+                    <button id="downloadButton" class="btn btn-outline-secondary" type="button" disabled>Download Dataset</button>
+                    <button id="saveButton" class="btn btn-outline-secondary" type="button" disabled>Save to Firebase</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <h3>Repositories and Info</h3>
+            <dl>
+                <dt>Stockfish player</dt>
+                <dd><a href="https://github.com/shaack/chess-console-stockfish">chess-console-stockfish</a></dd>
+                <dt>Chess framework</dt>
+                <dd><a href="https://github.com/shaack/chess-console">chess-console</a></dd>
+                <dt>SVG board</dt>
+                <dd><a href="https://github.com/shaack/cm-chessboard">cm-chessboard</a></dd>
+                <dt>Real-life example</dt>
+                <dd><a href="https://www.chessmail.eu/pages/chess-computer.html">chessmail.eu</a>
+                <dt>Engine (External)</dt>
+                <dd><a href="https://github.com/nmrugg/stockfish.js">stockfish-niklasf-v10.js</a></dd>
+            </dl>
+            <p class="small text-muted">
+                copyright &copy; <a href="https://shaack.com">shaack.com</a> engineering.<br/>
+                License: <a href="https://github.com/shaack/chess-console/blob/master/LICENSE">MIT</a>.
+                Sounds: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+                SVG pieces <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.
+            </p>
         </div>
-    </form>
-    <h3>Repositories and further information on GitHub</h3>
-    <dl>
-        <dt>the Stockfish player for chess-console</dt>
-        <dd><a href="https://github.com/shaack/chess-console-stockfish">chess-console-stockfish</a></dd>
-        <dt>The framework for playing chess in a website</dt>
-        <dd><a href="https://github.com/shaack/chess-console">chess-console</a></dd>
-        <dt>the SVG rendered board used in chess-console</dt>
-        <dd><a href="https://github.com/shaack/cm-chessboard">cm-chessboard</a></dd>
-        <dt>The Stockfish player used online at chessmail</dt>
-        <dd><a href="https://www.chessmail.eu/pages/chess-computer.html">chessmail.eu</a>
-        <dt>The chess computer engine in JavaScript (External)</dt>
-        <dd><a href="https://github.com/nmrugg/stockfish.js">stockfish-niklasf-v10.js</a>
-        </dd>
-    </dl>
-    <p>
-        copyright &copy; <a href="https://shaack.com">shaack.com</a> engineering.<br/>
-        Source code license: <a href="https://github.com/shaack/chess-console/blob/master/LICENSE">MIT</a>.
-        License for the Sounds: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. License of the SVG
-        pieces <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.
-    </p>
+    </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -108,6 +132,8 @@
     import {StockfishStateView} from "./src/StockfishStateView.js"
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
     import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
+    import {Auth} from "./src/Auth.js"
+    import {getAnalytics} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js"
 
     const i18n = new I18n()
     i18n.load({
@@ -123,7 +149,7 @@
         {name: i18n.t("playerName"), type: LocalPlayer},
         {
             name: "Stockfish", type: StockfishPlayer, props: {
-                worker: "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/engines/stockfish-v10-niklasf.js",
+                worker: "./src/stockfish-worker-proxy.js",
                 book: "./assets/books/openings.bin",
                 level: 1,
                 debug: true
@@ -171,7 +197,7 @@
         generateButton.innerText = "Generate Recommendations"
         generateButton.disabled = false
         downloadButton.disabled = false
-        saveButton.disabled = false
+        saveButton.disabled = auth.auth.currentUser === null
     })
 
     document.getElementById("downloadButton").addEventListener("click", () => {
@@ -183,6 +209,41 @@
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     })
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyA9In9YKWha3fqaYK1KuYV9j_hhGqUz_vE",
+        authDomain: "chess-history-analyst.firebaseapp.com",
+        projectId: "chess-history-analyst",
+        storageBucket: "chess-history-analyst.firebasestorage.app",
+        messagingSenderId: "676805765630",
+        appId: "1:676805765630:web:1af5342e293af9e24738af",
+        measurementId: "G-5Z27BVFS84"
+    }
+
+    const auth = new Auth(firebaseConfig, (user) => {
+        const loginButton = document.getElementById("loginButton")
+        const userInfo = document.getElementById("userInfo")
+        const userName = document.getElementById("userName")
+        const saveButton = document.getElementById("saveButton")
+
+        if (user) {
+            loginButton.classList.add("d-none")
+            userInfo.classList.remove("d-none")
+            userName.innerText = user.displayName
+            saveButton.disabled = analysisResult === null
+        } else {
+            loginButton.classList.remove("d-none")
+            userInfo.classList.add("d-none")
+            saveButton.disabled = true
+        }
+    })
+
+    document.getElementById("loginButton").addEventListener("click", () => auth.login())
+    document.getElementById("logoutButton").addEventListener("click", () => auth.logout())
+
+    // Initialize Analytics
+    getAnalytics(auth.app)
 </script>
 </body>
 </html>
