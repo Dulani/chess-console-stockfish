@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>Chess Analyst</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0"/>
@@ -345,13 +346,13 @@
 
     importPgnButton.addEventListener("click", async () => {
         const pgnText = pgnImportInput.value
-        if (!pgnText.trim()) return
+        console.log("Input:", pgnText); if (!pgnText.trim()) { console.log("Empty Input"); return }
 
         importPgnButton.disabled = true
-        importPgnButton.innerText = "Uploading..."
+        console.log("Starting..."); importPgnButton.innerText = "Uploading..."
 
-        const games = splitPgn(pgnText)
-        for (const pgnString of games) {
+        const games = splitPgn(pgnText); console.log("Split games:", games.length, games)
+        try { for (const pgnString of games) {
             try {
                 const pgn = new Pgn(pgnString)
                 const gameData = {
@@ -361,15 +362,15 @@
                     date: pgn.header.tags["Date"] || "Unknown",
                     result: pgn.header.tags["Result"] || "Unknown"
                 }
-                await firebase.saveGame(firebase.auth.currentUser.uid, gameData)
+                console.log("Saving game..."); await firebase.saveGame(firebase.auth.currentUser.uid, gameData); console.log("Game saved!")
             } catch (e) {
-                console.error("Error parsing/saving game", e)
+                console.error("Error parsing/saving game", e); console.log("Failed game PGN:", pgnString)
             }
         }
 
         pgnImportInput.value = ""
         importPgnButton.disabled = false
-        importPgnButton.innerText = "Upload Games"
+        } finally { importPgnButton.disabled = false; importPgnButton.innerText = "Upload Games" }
         loadGamesList()
     })
 
