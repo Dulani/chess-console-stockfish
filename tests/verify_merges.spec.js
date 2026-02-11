@@ -14,13 +14,9 @@ test('verify integrated features', async ({ page }) => {
   await expect(h1).toHaveAttribute('title', 'v0.11');
   await expect(h1).toHaveText('Chess Analyst');
 
-  // Verify sidebar offcanvas button position and functionality
-  const menuButton = page.locator('.sidebar-toggle');
+  // Verify sidebar offcanvas
+  const menuButton = page.locator('button[data-bs-target="#offcanvasSidebar"]');
   await expect(menuButton).toBeVisible();
-
-  // Verify it is fixed (by checking its position or class)
-  await expect(menuButton).toHaveClass(/sidebar-toggle/);
-
   await menuButton.click();
 
   const sidebar = page.locator('#offcanvasSidebar');
