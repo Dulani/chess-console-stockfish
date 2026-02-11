@@ -7,14 +7,38 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
     <link rel="stylesheet" href="./assets/styles/screen.css"/>
+    <style>
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            z-index: 1100;
+            background-color: #28a745;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            border: none;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .sidebar-toggle:hover {
+            background-color: #218838;
+        }
+        /* Adjust header to not be covered by fixed button */
+        h1 {
+            margin-left: 50px;
+        }
+    </style>
 </head>
 <body>
+<button class="sidebar-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+    <i class="fas fa-bars"></i>
+</button>
 <div class="container-fluid">
-    <div class="float-start mt-2">
-        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
-            <i class="fas fa-bars"></i> Menu
-        </button>
-    </div>
     <div class="float-end mt-2">
         <button id="loginButton" class="btn btn-outline-primary btn-sm">Login with Google</button>
         <div id="userInfo" class="d-none">
