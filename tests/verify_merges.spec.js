@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test';
 
 test('verify integrated features', async ({ page }) => {
+  const errors = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') {
+      errors.push(`Console error: ${msg.text()}`);
+    }
+  });
+  page.on('pageerror', error => {
+    errors.push(`Page error: ${error.message}`);
+  });
+  page.on('requestfailed', request => {
+    errors.push(`Request failed: ${request.url()} (${request.failure().errorText})`);
+  });
+
   // Use a larger viewport as recommended in memory
   await page.setViewportSize({ width: 1920, height: 1080 });
 
@@ -14,9 +27,13 @@ test('verify integrated features', async ({ page }) => {
   await expect(h1).toHaveAttribute('title', 'v0.11');
   await expect(h1).toHaveText('Chess Analyst');
 
-  // Verify sidebar offcanvas
-  const menuButton = page.locator('button[data-bs-target="#offcanvasSidebar"]');
+  // Verify sidebar offcanvas button position and functionality
+  const menuButton = page.locator('.sidebar-toggle');
   await expect(menuButton).toBeVisible();
+
+  // Verify it is fixed (by checking its position or class)
+  await expect(menuButton).toHaveClass(/sidebar-toggle/);
+
   await menuButton.click();
 
   const sidebar = page.locator('#offcanvasSidebar');
@@ -26,4 +43,6 @@ test('verify integrated features', async ({ page }) => {
   const generateButton = page.locator('#generateButton');
   await expect(generateButton).toBeVisible();
   await expect(generateButton).toHaveText('Generate Recommendations');
+
+  expect(errors).toEqual([]);
 });

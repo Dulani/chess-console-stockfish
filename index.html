@@ -32,6 +32,18 @@
         h1 {
             margin-left: 50px;
         }
+        #gamesList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .game-item {
+            cursor: pointer;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .game-item:hover {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -40,9 +52,6 @@
 </button>
 <div class="container-fluid">
     <div class="float-end mt-2">
-        <button class="btn btn-outline-secondary btn-sm me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
-            <i class="fas fa-bars"></i> Menu
-        </button>
         <button id="loginButton" class="btn btn-outline-primary btn-sm">Login with Google</button>
         <div id="userInfo" class="d-none">
             <span id="userName" class="me-2"></span>
@@ -57,6 +66,7 @@
                 <div class="chess-console-board"></div>
             </div>
             <div class="chess-console-right col-xl-3 order-xl-3 col-lg-4 order-lg-2 col-md-8 order-md-3">
+                <div id="replayStatus" class="alert alert-info d-none mb-3"></div>
                 <div class="control-buttons buttons-grid mb-4"></div>
                 <div class="chess-console-notifications mb-4"></div>
                 <div class="engine-state mb-4"></div>
@@ -91,10 +101,30 @@
                 </div>
                 <div class="d-grid gap-2 mb-4">
                     <button id="generateButton" class="btn btn-outline-primary" type="button">Generate Recommendations</button>
+                    <button id="replayButton" class="btn btn-outline-success" type="button">Replay with Analysis</button>
                     <button id="downloadButton" class="btn btn-outline-secondary" type="button" disabled>Download Dataset</button>
                     <button id="saveButton" class="btn btn-outline-secondary" type="button" disabled>Save to Firebase</button>
                 </div>
             </form>
+
+            <hr>
+
+            <div id="authRequiredSection" class="text-center mb-4">
+                <p class="text-muted">Login to import and save games.</p>
+            </div>
+
+            <div id="gameManagementSection" class="d-none">
+                <h6>Import PGN</h6>
+                <div class="mb-3">
+                    <textarea id="pgnImportInput" class="form-control" rows="3" placeholder="Paste PGN here..."></textarea>
+                </div>
+                <button id="importPgnButton" class="btn btn-primary btn-sm mb-4">Upload Games</button>
+
+                <h6>My Games</h6>
+                <div id="gamesList" class="border rounded mb-4">
+                    <div class="p-3 text-center text-muted">No games uploaded yet.</div>
+                </div>
+            </div>
 
             <hr>
 
@@ -130,7 +160,7 @@
     {
         "imports": {
             "chess-console/": "https://cdn.jsdelivr.net/npm/chess-console@6.12.4/",
-            "cm-engine-runner/": "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.2/",
+            "cm-engine-runner/": "https://cdn.jsdelivr.net/npm/cm-engine-runner@1.2.4/",
             "cm-web-modules/": "https://cdn.jsdelivr.net/npm/cm-web-modules@2.4.4/",
             "cm-polyglot/": "https://cdn.jsdelivr.net/npm/cm-polyglot/",
             "cm-chessboard/": "https://cdn.jsdelivr.net/npm/cm-chessboard/",
@@ -159,8 +189,27 @@
     import {StockfishStateView} from "./src/StockfishStateView.js"
     import {I18n} from "cm-web-modules/src/i18n/I18n.js"
     import {AnalysisGenerator} from "./src/AnalysisGenerator.js"
-    import {Auth} from "./src/Auth.js"
+    import {Firebase} from "./src/Firebase.js"
     import {getAnalytics} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js"
+    import {Pgn} from "cm-pgn/src/Pgn.js"
+
+    // DOM Elements
+    const fenInput = document.getElementById("fenInput")
+    const fenButton = document.getElementById("fenButton")
+    const generateButton = document.getElementById("generateButton")
+    const replayButton = document.getElementById("replayButton")
+    const downloadButton = document.getElementById("downloadButton")
+    const saveButton = document.getElementById("saveButton")
+    const loginButton = document.getElementById("loginButton")
+    const logoutButton = document.getElementById("logoutButton")
+    const userInfo = document.getElementById("userInfo")
+    const userName = document.getElementById("userName")
+    const authRequiredSection = document.getElementById("authRequiredSection")
+    const gameManagementSection = document.getElementById("gameManagementSection")
+    const pgnImportInput = document.getElementById("pgnImportInput")
+    const importPgnButton = document.getElementById("importPgnButton")
+    const gamesList = document.getElementById("gamesList")
+    const replayStatus = document.getElementById("replayStatus")
 
     const i18n = new I18n()
     i18n.load({
@@ -201,8 +250,8 @@
         soundSpriteFile: "./assets/sounds/chess_console_sounds.mp3"
     })
 
-    document.getElementById("fenButton").addEventListener("click", () => {
-        const fen = document.getElementById("fenInput").value
+    fenButton.addEventListener("click", () => {
+        const fen = fenInput.value
         const pgn = `[SetUp "1"]
 [FEN "${fen}"]`
         chessConsole.initGame({
@@ -211,10 +260,7 @@
     })
 
     let analysisResult = null
-    document.getElementById("generateButton").addEventListener("click", async () => {
-        const generateButton = document.getElementById("generateButton")
-        const downloadButton = document.getElementById("downloadButton")
-        const saveButton = document.getElementById("saveButton")
+    generateButton.addEventListener("click", async () => {
         generateButton.innerText = "Generating..."
         generateButton.disabled = true
         downloadButton.disabled = true
@@ -224,10 +270,10 @@
         generateButton.innerText = "Generate Recommendations"
         generateButton.disabled = false
         downloadButton.disabled = false
-        saveButton.disabled = auth.auth.currentUser === null
+        saveButton.disabled = firebase.auth.currentUser === null
     })
 
-    document.getElementById("downloadButton").addEventListener("click", () => {
+    downloadButton.addEventListener("click", () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(analysisResult, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
@@ -248,29 +294,135 @@
         measurementId: "G-5Z27BVFS84"
     }
 
-    const auth = new Auth(firebaseConfig, (user) => {
-        const loginButton = document.getElementById("loginButton")
-        const userInfo = document.getElementById("userInfo")
-        const userName = document.getElementById("userName")
-        const saveButton = document.getElementById("saveButton")
-
+    const firebase = new Firebase(firebaseConfig, (user) => {
         if (user) {
             loginButton.classList.add("d-none")
             userInfo.classList.remove("d-none")
             userName.innerText = user.displayName
             saveButton.disabled = analysisResult === null
+            authRequiredSection.classList.add("d-none")
+            gameManagementSection.classList.remove("d-none")
+            loadGamesList()
         } else {
             loginButton.classList.remove("d-none")
             userInfo.classList.add("d-none")
             saveButton.disabled = true
+            authRequiredSection.classList.remove("d-none")
+            gameManagementSection.classList.add("d-none")
         }
     })
 
-    document.getElementById("loginButton").addEventListener("click", () => auth.login())
-    document.getElementById("logoutButton").addEventListener("click", () => auth.logout())
+    loginButton.addEventListener("click", () => firebase.login())
+    logoutButton.addEventListener("click", () => firebase.logout())
 
     // Initialize Analytics
-    getAnalytics(auth.app)
+    getAnalytics(firebase.app)
+
+    async function loadGamesList() {
+        gamesList.innerHTML = '<div class="p-3 text-center text-muted">Loading games...</div>'
+        try {
+            const games = await firebase.getGames(firebase.auth.currentUser.uid)
+            if (games.length === 0) {
+                gamesList.innerHTML = '<div class="p-3 text-center text-muted">No games uploaded yet.</div>'
+            } else {
+                gamesList.innerHTML = ""
+                games.forEach(game => {
+                    const item = document.createElement("div")
+                    item.className = "game-item"
+                    item.innerHTML = `<strong>${game.white} vs ${game.black}</strong><br><small class="text-muted">${game.date} - ${game.result}</small>`
+                    item.addEventListener("click", () => {
+                        chessConsole.initGame({pgn: game.pgn})
+                        const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasSidebar'))
+                        if (offcanvas) offcanvas.hide()
+                    })
+                    gamesList.appendChild(item)
+                })
+            }
+        } catch (error) {
+            gamesList.innerHTML = '<div class="p-3 text-center text-danger">Error loading games.</div>'
+        }
+    }
+
+    importPgnButton.addEventListener("click", async () => {
+        const pgnText = pgnImportInput.value
+        if (!pgnText.trim()) return
+
+        importPgnButton.disabled = true
+        importPgnButton.innerText = "Uploading..."
+
+        const games = splitPgn(pgnText)
+        for (const pgnString of games) {
+            try {
+                const pgn = new Pgn(pgnString)
+                const gameData = {
+                    pgn: pgnString,
+                    white: pgn.header.tags["White"] || "Unknown",
+                    black: pgn.header.tags["Black"] || "Unknown",
+                    date: pgn.header.tags["Date"] || "Unknown",
+                    result: pgn.header.tags["Result"] || "Unknown"
+                }
+                await firebase.saveGame(firebase.auth.currentUser.uid, gameData)
+            } catch (e) {
+                console.error("Error parsing/saving game", e)
+            }
+        }
+
+        pgnImportInput.value = ""
+        importPgnButton.disabled = false
+        importPgnButton.innerText = "Upload Games"
+        loadGamesList()
+    })
+
+    function splitPgn(pgnString) {
+        const games = []
+        const lines = pgnString.split(/\r?\n/)
+        let currentGame = ""
+        for (const line of lines) {
+            if (line.startsWith("[Event ") && currentGame.trim() !== "") {
+                games.push(currentGame.trim())
+                currentGame = ""
+            }
+            currentGame += line + "\n"
+        }
+        if (currentGame.trim() !== "") {
+            games.push(currentGame.trim())
+        }
+        return games
+    }
+
+    replayButton.addEventListener("click", async () => {
+        replayButton.disabled = true
+        replayStatus.classList.remove("d-none")
+        replayStatus.innerText = "Starting replay..."
+
+        const fullHistory = chessConsole.state.chess.history({verbose: true})
+
+        for (let i = 0; i < fullHistory.length; i++) {
+            const move = fullHistory[i]
+            const fenBefore = move.before
+
+            // Go to position before this move
+            chessConsole.state.plyViewed = i
+
+            replayStatus.innerText = "Stockfish is thinking..."
+            // Get Stockfish recommendation for position before the move
+            const recommendation = await chessConsole.opponent.moveRequest(fenBefore)
+            replayStatus.innerHTML = `Move ${Math.floor(i/2) + 1} (${i % 2 === 0 ? 'White' : 'Black'}):<br>Stockfish recommends: <strong>${recommendation.san}</strong>`
+
+            await new Promise(resolve => setTimeout(resolve, 2000))
+
+            // Go to position after this move
+            chessConsole.state.plyViewed = i + 1
+            await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+
+        replayButton.disabled = false
+        replayStatus.innerText = "Replay finished."
+        setTimeout(() => {
+            replayStatus.classList.add("d-none")
+        }, 3000)
+    })
+
 </script>
 </body>
 </html>
