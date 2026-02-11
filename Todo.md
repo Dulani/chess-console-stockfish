@@ -7,14 +7,15 @@ This roadmap outlines the development of the personal chess analysis tool.
   - [x] Integrate Firebase Auth foundation.
   - [x] Implement login/logout UI and logic.
   - [x] Configure Firebase Project.
-- [ ] **Data Storage (Firebase)**
-  - Set up Firestore or Realtime Database to store user game data.
-  - Implement basic save/load functionality for analysis results.
+- [x] **Data Storage (Firebase)**
+  - [x] Set up Firestore to store user game data.
+  - [x] Implement basic save/load functionality for games.
 
 ## Phase 2: Analysis & Mistake Aggregation
 - [ ] **Personal Analysis Tool**
-  - Enhance `AnalysisGenerator` to systematically identify "mistakes" by comparing player moves to Stockfish's top recommendations.
-  - Define thresholds for what constitutes a mistake/inaccuracy/blunder.
+  - [x] Implement "Replay with Analysis" to watch games with Stockfish recommendations.
+  - [ ] Enhance `AnalysisGenerator` to systematically identify "mistakes" by comparing player moves to Stockfish's top recommendations.
+  - [ ] Define thresholds for what constitutes a mistake/inaccuracy/blunder.
 - [ ] **Mistake Aggregation**
   - Track mistakes by:
     - Piece type
@@ -23,6 +24,8 @@ This roadmap outlines the development of the personal chess analysis tool.
   - Create a dashboard or view to visualize these patterns.
 
 ## Phase 3: Game Importing & Scraping
+- [x] **Bulk Import**
+  - [x] Implement PGN bulk import.
 - [ ] **chess.com Integration**
   - Implement a way to import/scrape past games directly from chess.com via their API or other means.
 - [ ] **Gmail Integration**
@@ -30,8 +33,6 @@ This roadmap outlines the development of the personal chess analysis tool.
 
 ## Completed
 - [x] Sync with upstream master.
-- [x] Rebase and merge feature branches:
-  - `feat/github-pages-hosting` (CDN support)
-  - `feat/stockfish-analysis-dataset` (Initial analysis logic)
-  - `feature/fix-imports-and-add-version` (Import fixes and versioning)
+- [x] Rebase and merge feature branches.
 - [x] Resolve cross-origin Worker issues for GitHub Pages hosting.
+- [x] Overhaul UI with styled fixed-position sidebar toggle.
